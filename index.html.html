@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#11112b">
+<title>StarPath Study Coach</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0b1b;--panel:#17172f;--panel2:#202044;--text:#f5f3ff;--muted:#b7b5d6;--accent:#b9a3ff;--pink:#f0a8df;--line:#343456}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#272052 0%,var(--bg) 55%);color:var(--text);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+main{max-width:760px;margin:auto;padding:22px 16px calc(40px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:13px;margin:6px 0 22px}.logo{width:54px;height:54px;border-radius:17px;background:linear-gradient(145deg,#7e68d9,#24234d);display:grid;place-items:center;font-size:28px;box-shadow:0 8px 28px #0005}
+h1{font-size:25px;margin:0;letter-spacing:.2px}header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.panel{background:linear-gradient(150deg,#1a1a38ed,#121226f5);border:1px solid var(--line);border-radius:22px;padding:19px;margin:13px 0;box-shadow:0 10px 30px #0002}
+h2{font-size:17px;margin:0 0 14px}p{line-height:1.45}.muted{color:var(--muted);font-size:13px}
+.timer{text-align:center;padding:24px 12px}.clock{font-size:clamp(54px,15vw,78px);font-weight:650;letter-spacing:2px;font-variant-numeric:tabular-nums;margin:10px 0}
+button,select,input{font:inherit;border-radius:13px;border:1px solid var(--line);padding:12px;background:#252547;color:var(--text)}button{cursor:pointer;font-weight:600}button.primary{background:linear-gradient(110deg,#8f7be7,#c084cf);border:0;color:#17132c}button.secondary{background:#252547}button:active{transform:scale(.98)}.buttons{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}.choices{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.choices button{padding:9px 13px;font-size:14px}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}input,select{width:100%;min-width:0}form{display:flex;gap:8px}form input{flex:1}form button{white-space:nowrap}
+ul{list-style:none;padding:0;margin:10px 0 0}li{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #343456}li:last-child{border-bottom:0}li span{flex:1;overflow-wrap:anywhere}li.done span{text-decoration:line-through;color:#9b99b8}li button{padding:6px 9px;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#222243;border-radius:15px;padding:13px 8px;text-align:center}.stat strong{display:block;font-size:24px}.stat span{font-size:11px;color:var(--muted)}
+.progress{height:8px;border-radius:10px;background:#333253;overflow:hidden;margin-top:12px}.progress div{height:100%;width:0;background:linear-gradient(90deg,#a695ff,#f0a8df);transition:width .2s}
+.tip{border-left:3px solid var(--accent);padding-left:12px;color:#dcd8ff}.smallbtn{background:transparent;color:var(--muted);border:0;padding:7px}.footer{text-align:center;color:#8886ac;font-size:12px;margin:22px 0 0}
+@media(min-width:650px){.cols{display:grid;grid-template-columns:1fr 1fr;gap:13px}.cols .panel{margin:0}.timerpanel{grid-row:span 2}}
+</style>
+</head>
+<body><main>
+<header><div class="logo" aria-hidden="true">☾</div><div><h1>StarPath</h1><p>Your personal study coach · one step at a time</p></div></header>
+<section class="panel timerpanel timer">
+<div class="muted" id="modeLabel">FOCUS SESSION</div><div class="clock" id="clock">25:00</div>
+<div class="choices" aria-label="Timer length"><button class="secondary" data-min="25">25 min</button><button class="secondary" data-min="45">45 min</button><button class="secondary" data-min="60">60 min</button></div>
+<div class="buttons" style="margin-top:15px"><button class="primary" id="start">Start focus</button><button class="secondary" id="reset">Reset</button><button class="secondary" id="break">5-min break</button></div>
+<p class="muted" id="timerMessage">Choose one task. You only need to begin.</p>
+</section>
+<div class="cols">
+<section class="panel"><h2>🌠 Today's mission</h2>
+<label for="mission">My main goal</label><input id="mission" placeholder="e.g. Solve 3 mechanics problems">
+<label for="topic">Study area</label><select id="topic"><option>Astronomy Olympiad</option><option>Astrophysics</option><option>Mechanics</option><option>Spherical astronomy</option><option>Mathematics</option><option>Cosmology</option><option>Data analysis</option><option>Rest & recovery</option></select>
+<p class="muted">Make the goal small enough to start now.</p>
+</section>
+<section class="panel"><h2>✨ Add a task</h2><form id="taskForm"><input id="taskInput" placeholder="One small next step…" maxlength="120" required><button class="primary" type="submit">Add</button></form><ul id="tasks"></ul><p class="muted" id="empty">Your tasks will appear here.</p></section>
+<section class="panel"><h2>🪐 Your progress</h2><div class="stats"><div class="stat"><strong id="sessions">0</strong><span>FOCUS SESSIONS</span></div><div class="stat"><strong id="minutes">0</strong><span>MINUTES FOCUSED</span></div><div class="stat"><strong id="doneCount">0</strong><span>TASKS DONE</span></div></div><div class="progress"><div id="bar"></div></div><p class="muted" id="progressText">Every focused minute counts.</p><button class="smallbtn" id="clearProgress">Reset progress</button></section>
+<section class="panel"><h2>💜 Coach's note</h2><p class="tip" id="coach">You don't need to feel motivated first. Put one problem in front of you and work on it for five minutes.</p><label for="energy">How is your energy?</label><select id="energy"><option value="low">Low — keep it gentle</option><option value="medium" selected>Medium — steady pace</option><option value="high">High — ready for a challenge</option></select><button class="secondary" id="advice" style="margin-top:9px;width:100%">Give me a study suggestion</button></section>
+</div>
+<section class="panel"><h2>🛡️ Distraction shield</h2><p>Before a session, switch on your iPad's <b>Study Focus</b> and use <b>Settings → Screen Time → App Limits</b> to set limits for distracting apps.</p><p class="muted">This web app cannot block other apps itself. Timer and task data are saved on this device's browser when storage is available.</p></section>
+<p class="footer">Made for your next small step. Rest is part of progress, too. ✦</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let total=25*60,left=total,interval=null,running=false,breakMode=false;
+let state={sessions:0,minutes:0,done:0,tasks:[]};
+try{state={...state,...JSON.parse(localStorage.getItem('starpath-state')||'{}')}}catch(e){}
+function save(){try{localStorage.setItem('starpath-state',JSON.stringify(state))}catch(e){}}
+function renderClock(){ $('clock').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');}
+function stop(){if(interval)clearInterval(interval);interval=null;running=false;$('start').textContent='Start focus'}
+function start(){if(running){stop();$('timerMessage').textContent='Paused. Resume whenever you are ready.';return}running=true;$('start').textContent='Pause';$('timerMessage').textContent=breakMode?'Enjoy your break.':'One task, one session.';interval=setInterval(()=>{left--;renderClock();if(left<=0){stop();if(!breakMode){state.sessions++;state.minutes+=Math.round(total/60);save();renderStats();$('timerMessage').textContent='Session complete! Stand up, stretch, and celebrate the work you did.';if(navigator.vibrate)navigator.vibrate([180,80,180])}else $('timerMessage').textContent='Break finished. Ready for the next step?';breakMode=false;$('modeLabel').textContent='FOCUS SESSION';total=25*60;left=total;renderClock();},1000)}
+function setTimer(min,isBreak=false){stop();breakMode=isBreak;total=min*60;left=total;$('modeLabel').textContent=isBreak?'SHORT BREAK':'FOCUS SESSION';$('timerMessage').textContent=isBreak?'Take a real break away from the screen.':'Choose one task. You only need to begin.';renderClock()}
+document.querySelectorAll('[data-min]').forEach(b=>b.addEventListener('click',()=>setTimer(+b.dataset.min)));
+$('start').addEventListener('click',start);$('reset').addEventListener('click',()=>setTimer(breakMode?5:25,breakMode));$('break').addEventListener('click',()=>setTimer(5,true));
+function renderTasks(){const ul=$('tasks');ul.innerHTML='';state.tasks.forEach((t,i)=>{const li=document.createElement('li');if(t.done)li.className='done';const cb=document.createElement('input');cb.type='checkbox';cb.checked=t.done;cb.style.width='20px';cb.addEventListener('change',()=>{state.tasks[i].done=cb.checked;if(cb.checked)state.done++;else state.done=Math.max(0,state.done-1);save();renderTasks();renderStats()});const span=document.createElement('span');span.textContent=t.text;const del=document.createElement('button');del.textContent='Remove';del.className='secondary';del.addEventListener('click',()=>{if(t.done)state.done=Math.max(0,state.done-1);state.tasks.splice(i,1);save();renderTasks();renderStats()});li.append(cb,span,del);ul.append(li)});$('empty').style.display=state.tasks.length?'none':'block'}
+$('taskForm').addEventListener('submit',e=>{e.preventDefault();const v=$('taskInput').value.trim();if(!v)return;state.tasks.push({text:v,done:false});$('taskInput').value='';save();renderTasks();renderStats()});
+$('mission').value=localStorage.getItem('starpath-mission')||'';$('mission').addEventListener('input',()=>{try{localStorage.setItem('starpath-mission',$('mission').value)}catch(e){}});
+function renderStats(){$('sessions').textContent=state.sessions||0;$('minutes').textContent=state.minutes||0;$('doneCount').textContent=state.done||0;const totalTasks=state.tasks.length;const completed=state.tasks.filter(t=>t.done).length;$('bar').style.width=(totalTasks?completed/totalTasks*100:0)+'%';$('progressText').textContent=totalTasks?`${completed} of ${totalTasks} tasks completed today.`:'Every focused minute counts.'}
+$('clearProgress').addEventListener('click',()=>{if(confirm('Reset your saved progress and tasks?')){state={sessions:0,minutes:0,done:0,tasks:[]};save();renderTasks();renderStats()}});
+$('advice').addEventListener('click',()=>{const e=$('energy').value;const tips={low:'Choose the easiest useful step: read one worked example, then try just the first part of a problem. A short session is enough to restart.',medium:'Try one 25-minute block: 3 minutes to understand the question, 17 minutes to solve, 5 minutes to check units and assumptions.',high:'Choose a challenging Olympiad problem. Work independently first, write down assumptions, then check your result and note what you learned.'};$('coach').textContent=tips[e]});
+renderClock();renderTasks();renderStats();
+</script>
+</body></html>
